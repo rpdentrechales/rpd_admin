@@ -9,4 +9,4 @@ st.title("Testes - Link das vendedoras")
 
 vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
 
-st.dataframe(vendedoras_df,hide_index=True,use_cotainer_width=True)
+st.dataframe(vendedoras_df,hide_index=True,use_container_width=True)
