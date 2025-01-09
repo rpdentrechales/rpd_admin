@@ -5,8 +5,6 @@ from auxiliar.auxiliar import *
 import plotly.express as px
 
 st.set_page_config(page_title="Pró-Corpo - Visualizar Vendas", page_icon="💎",layout="wide")
-
-vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
 billcharges_df = get_dataframe_from_mongodb(collection_name="billcharges_db", database_name="dash_midia")
 
 filtro_pagamento = ['Utilizar Crédito','Crédito Promocional','Vale Tratamento','Credito CRMBonus']
@@ -32,41 +30,17 @@ meses = sorted(billcharges_df["period"].unique(),reverse=True)
 seletor_mes = st.selectbox("Selecione um mês", meses)
 billcharges_filtered_df = billcharges_df.loc[billcharges_df["period"] == seletor_mes]
 
-groupby_vendedora = billcharges_filtered_df.groupby(['created_by','store_name']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
+groupby_vendedora = billcharges_filtered_df.groupby(['created_by']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
 
-st.dataframe(groupby_vendedora,use_container_width=True,hide_index=True)
+column_config ={
+                "amount": st.column_config.NumberColumn(
+                "Valor Total",
+                format="R$%.2f",
+                  ),
+                "avista": st.column_config.NumberColumn(
+                "Valor à Vista",
+                format="R$%.2f",
+                )
+              }
 
-
-# column_config ={
-#                 "amount": st.column_config.NumberColumn(
-#                 "Valor Total",
-#                 format="R$%.2f",
-#                   ),
-#                 "avista": st.column_config.NumberColumn(
-#                 "Valor à Vista",
-#                 format="R$%.2f",
-#                 )
-#               }
-
-# st.subheader("Resumo do Dia")
-
-# dias_seletor = billcharges_df["formatted_date"].sort_values(ascending=False).unique()
-# seletor_dia = st.selectbox("Selecione um dia", dias_seletor)
-
-# resumo_1, resumo_2 = st.columns([3,1])
-
-# billcharges_df_dia = billcharges_df.loc[billcharges_df["formatted_date"] == seletor_dia]
-# groupby_quote_dia = billcharges_df_dia.groupby(['quote_id','customer_id','customer_name','customer_email']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
-
-# with resumo_1:
-
-#   st.dataframe(groupby_quote_dia,hide_index=True,use_container_width=True,column_config=column_config)
-
-# with resumo_2:
-#   total_sales_dia = groupby_quote_dia["amount"].sum()
-#   total_avista_dia = groupby_quote_dia["avista"].sum()
-#   total_vendas_dia = groupby_quote_dia["quote_id"].count()
-
-#   st.metric(label="Quantidade de vendas", value=total_vendas_dia)
-#   st.metric(label="Vendas Total (R$)", value=f"R$ {total_sales_dia:,.2f}")
-#   st.metric(label="Vendas à vista (R$)", value=f"R$ {total_avista_dia:,.2f}")
+st.dataframe(groupby_vendedora,use_container_width=True,hide_index=True,column_config=column_config)
