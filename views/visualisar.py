@@ -27,13 +27,12 @@ billcharges_df["customer_id"] = billcharges_df["customer_id"].astype(str)
 
 st.title("Resumo do Mês por Vendedora")
 
-st.write(billcharges_df.columns)
 meses = sorted(billcharges_df["period"].unique(),reverse=True)
 
 seletor_mes = st.selectbox("Selecione um mês", meses)
 billcharges_filtered_df = billcharges_df.loc[billcharges_df["period"] == seletor_mes]
 
-groupby_vendedora = billcharges_filtered_df.groupby(['created_by','store']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
+groupby_vendedora = billcharges_filtered_df.groupby(['created_by','store_name']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
 
 st.dataframe(groupby_vendedora,use_container_width=True,hide_index=True)
 
