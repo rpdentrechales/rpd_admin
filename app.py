@@ -3,7 +3,7 @@ import streamlit as st
 # --- PAGE SETUP ---
 visualizar_page = st.Page(
     "views/visualisar.py",
-    title="Visualizar Vendas",
+    title="Visualizar Vendas Geral",
     icon=":material/point_of_sale:"
 )
 configurar_page = st.Page(

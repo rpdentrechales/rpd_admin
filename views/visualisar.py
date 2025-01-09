@@ -6,107 +6,66 @@ import plotly.express as px
 
 st.set_page_config(page_title="Pró-Corpo - Visualizar Vendas", page_icon="💎",layout="wide")
 
-url_parameters = st.query_params
-error_page = True
+vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
+billcharges_df = get_dataframe_from_mongodb(collection_name="billcharges_db", database_name="dash_midia")
 
-if "id" in url_parameters:
+filtro_pagamento = ['Utilizar Crédito','Crédito Promocional','Vale Tratamento','Credito CRMBonus']
+billcharges_df = billcharges_df.loc[~billcharges_df["payment_method"].isin(filtro_pagamento)]
 
-  id_vendedora = st.query_params["id"]
-  vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
-  vendedoras_df = vendedoras_df.loc[vendedoras_df["id_vendedora"] == id_vendedora]
-  nome_vendedora = vendedoras_df["nome_vendedora"].iloc[0]
+filtro_avista = ['PIX','Cartão de Crédito à Vista','Dinheiro','Cartão de Crédito Vindi à Vista',
+    'Cartão de Crédito à Vista (Link)', 'Transferência Bancária']
 
-  if nome_vendedora:
-    query = {"created_by": nome_vendedora,"status":"completed"}
+billcharges_df["amount"] = billcharges_df["amount"]/100
+billcharges_df["due_at"] = pd.to_datetime(billcharges_df['due_at'], format="%Y-%m-%d %H:%M:%S").dt.strftime("%Y-%m-%d")
+billcharges_df['due_at'] = pd.to_datetime(billcharges_df['due_at'])
+billcharges_df['date'] = pd.to_datetime(billcharges_df['date'])
+billcharges_df['formatted_date'] = billcharges_df['date'].dt.to_period('D')
+billcharges_df['period'] = billcharges_df['date'].dt.to_period('M')
+billcharges_df['avista'] = billcharges_df.apply(lambda row: row['amount'] if row['payment_method'] in filtro_avista else 0, axis=1)
+billcharges_df["quote_id"] = billcharges_df["quote_id"].astype(str)
+billcharges_df["customer_id"] = billcharges_df["customer_id"].astype(str)
 
-    billcharges_vendedoras_df = get_dataframe_from_mongodb(collection_name="billcharges_db", database_name="dash_midia",query=query)
+st.title("Resumo do Mês por Vendedora")
 
-    filtro_pagamento = ['Utilizar Crédito','Crédito Promocional','Vale Tratamento','Credito CRMBonus']
-    billcharges_vendedoras_df = billcharges_vendedoras_df.loc[~billcharges_vendedoras_df["payment_method"].isin(filtro_pagamento)]
+meses = sorted(billcharges_df["period"].unique(),reverse=True)
 
-    filtro_avista = ['PIX','Cartão de Crédito à Vista','Dinheiro','Cartão de Crédito Vindi à Vista',
-       'Cartão de Crédito à Vista (Link)', 'Transferência Bancária']
+seletor_mes = st.selectbox("Selecione um mês", meses)
+billcharges_filtered_df = billcharges_df.loc[billcharges_df["period"] == seletor_mes]
 
-    st.title("Visualizar Vendas")
-    st.write(f"Olá, {nome_vendedora}")
+groupby_vendedora = billcharges_filtered_df.groupby(['created_by']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
 
-    billcharges_vendedoras_df["amount"] = billcharges_vendedoras_df["amount"]/100
-    billcharges_vendedoras_df["due_at"] = pd.to_datetime(billcharges_vendedoras_df['due_at'], format="%Y-%m-%d %H:%M:%S").dt.strftime("%Y-%m-%d")
-    billcharges_vendedoras_df['due_at'] = pd.to_datetime(billcharges_vendedoras_df['due_at'])
-    billcharges_vendedoras_df['date'] = pd.to_datetime(billcharges_vendedoras_df['date'])
-    billcharges_vendedoras_df['formatted_date'] = billcharges_vendedoras_df['date'].dt.to_period('D')
-    billcharges_vendedoras_df['period'] = billcharges_vendedoras_df['date'].dt.to_period('M')
-    billcharges_vendedoras_df['avista'] = billcharges_vendedoras_df.apply(lambda row: row['amount'] if row['payment_method'] in filtro_avista else 0, axis=1)
+st.dataframe(groupby_vendedora)
 
-    billcharges_vendedoras_df["quote_id"] = billcharges_vendedoras_df["quote_id"].astype(str)
-    billcharges_vendedoras_df["customer_id"] = billcharges_vendedoras_df["customer_id"].astype(str)
+# column_config ={
+#                 "amount": st.column_config.NumberColumn(
+#                 "Valor Total",
+#                 format="R$%.2f",
+#                   ),
+#                 "avista": st.column_config.NumberColumn(
+#                 "Valor à Vista",
+#                 format="R$%.2f",
+#                 )
+#               }
 
-    st.subheader("Resumo do Mês")
+# st.subheader("Resumo do Dia")
 
-    meses = sorted(billcharges_vendedoras_df["period"].unique(),reverse=True)
+# dias_seletor = billcharges_df["formatted_date"].sort_values(ascending=False).unique()
+# seletor_dia = st.selectbox("Selecione um dia", dias_seletor)
 
-    seletor_mes = st.selectbox("Selecione um mês", meses)
-    billcharges_vendedoras_df = billcharges_vendedoras_df.loc[billcharges_vendedoras_df["period"] == seletor_mes]
+# resumo_1, resumo_2 = st.columns([3,1])
 
-    metrica_mes_1,metrica_mes_2,metrica_mes_3 = st.columns(3)
+# billcharges_df_dia = billcharges_df.loc[billcharges_df["formatted_date"] == seletor_dia]
+# groupby_quote_dia = billcharges_df_dia.groupby(['quote_id','customer_id','customer_name','customer_email']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
 
-    with metrica_mes_1:
-      total_sales = billcharges_vendedoras_df["amount"].sum()
-      st.metric(label="Total de Vendas", value=f"R$ {total_sales:,.2f}")
+# with resumo_1:
 
-    with metrica_mes_2:
-      total_avista = billcharges_vendedoras_df["avista"].sum()
-      st.metric(label="Total de Vendas à Vista", value=f"R$ {total_avista:,.2f}")
+#   st.dataframe(groupby_quote_dia,hide_index=True,use_container_width=True,column_config=column_config)
 
-    with metrica_mes_3:
-      total_vendas = billcharges_vendedoras_df["quote_id"].count()
-      st.metric(label="Quantidade de Vendas", value=total_vendas)
+# with resumo_2:
+#   total_sales_dia = groupby_quote_dia["amount"].sum()
+#   total_avista_dia = groupby_quote_dia["avista"].sum()
+#   total_vendas_dia = groupby_quote_dia["quote_id"].count()
 
-    graph_1, graph_2 = st.columns(2)
-
-    with graph_1:
-      plot_sales_count(billcharges_vendedoras_df)
-
-    with graph_2:
-      plot_total_sales(billcharges_vendedoras_df)
-
-    groupby_quote = billcharges_vendedoras_df.groupby(['quote_id','customer_id']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
-
-    column_config ={
-                   "amount": st.column_config.NumberColumn(
-                    "Valor Total",
-                    format="R$%.2f",
-                     ),
-                    "avista": st.column_config.NumberColumn(
-                    "Valor à Vista",
-                    format="R$%.2f",
-                    )
-                  }
-
-    st.subheader("Resumo do Dia")
-
-    dias_seletor = billcharges_vendedoras_df["formatted_date"].sort_values(ascending=False).unique()
-    seletor_dia = st.selectbox("Selecione um dia", dias_seletor)
-
-    resumo_1, resumo_2 = st.columns([3,1])
-
-    billcharges_vendedoras_df_dia = billcharges_vendedoras_df.loc[billcharges_vendedoras_df["formatted_date"] == seletor_dia]
-    groupby_quote_dia = billcharges_vendedoras_df_dia.groupby(['quote_id','customer_id','customer_name','customer_email']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
-
-    with resumo_1:
-
-      st.dataframe(groupby_quote_dia,hide_index=True,use_container_width=True,column_config=column_config)
-
-    with resumo_2:
-      total_sales_dia = groupby_quote_dia["amount"].sum()
-      total_avista_dia = groupby_quote_dia["avista"].sum()
-      total_vendas_dia = groupby_quote_dia["quote_id"].count()
-
-      st.metric(label="Quantidade de vendas", value=total_vendas_dia)
-      st.metric(label="Vendas Total (R$)", value=f"R$ {total_sales_dia:,.2f}")
-      st.metric(label="Vendas à vista (R$)", value=f"R$ {total_avista_dia:,.2f}")
-
-    error_page = False
-
-if error_page:
-  st.title("Página não encontrada")
+#   st.metric(label="Quantidade de vendas", value=total_vendas_dia)
+#   st.metric(label="Vendas Total (R$)", value=f"R$ {total_sales_dia:,.2f}")
+#   st.metric(label="Vendas à vista (R$)", value=f"R$ {total_avista_dia:,.2f}")
