@@ -40,7 +40,8 @@ column_config ={
                 "avista": st.column_config.NumberColumn(
                 "Valor à Vista",
                 format="R$%.2f",
-                )
+                ),
+                'created_by': 'nome_vendedora'
               }
 
 st.dataframe(groupby_vendedora,use_container_width=True,hide_index=True,column_config=column_config)
