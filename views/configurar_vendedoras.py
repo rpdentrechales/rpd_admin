@@ -9,10 +9,4 @@ st.title("Testes - Link das vendedoras")
 
 vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
 
-nome_das_vendedoras = sorted(vendedoras_df["nome_vendedora"].unique())
-
-vendedora_selecionada = st.selectbox("Selecione uma Vendedora", nome_das_vendedoras)
-
-id_vendedora = vendedoras_df.loc[vendedoras_df["nome_vendedora"] == vendedora_selecionada, "id_vendedora"].values[0]
-
-st.markdown(f'[Abrir site da vendedora](https://rpd-visualizar.streamlit.app//visualisar?id={id_vendedora})')
+st.dataframe(vendedoras_df,hide_index=True,use_cotainer_width=True)
