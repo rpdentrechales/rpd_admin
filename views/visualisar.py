@@ -27,6 +27,7 @@ billcharges_df["customer_id"] = billcharges_df["customer_id"].astype(str)
 
 st.title("Resumo do Mês por Vendedora")
 
+st.write(billcharges_df.columns)
 meses = sorted(billcharges_df["period"].unique(),reverse=True)
 
 seletor_mes = st.selectbox("Selecione um mês", meses)
