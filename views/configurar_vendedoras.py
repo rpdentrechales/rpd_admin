@@ -5,7 +5,7 @@ from auxiliar.auxiliar import *
 
 st.set_page_config(page_title="RPD - Configurar Vendedoras", page_icon="💎",layout="wide")
 
-st.title("Testes - Link das vendedoras")
+st.title("Dados das Vendedoras")
 
 vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
 
