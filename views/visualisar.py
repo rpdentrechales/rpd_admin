@@ -34,7 +34,7 @@ billcharges_filtered_df = billcharges_df.loc[billcharges_df["period"] == seletor
 
 groupby_vendedora = billcharges_filtered_df.groupby(['created_by']).agg({'amount': 'sum', 'avista': 'sum'}).reset_index()
 
-st.dataframe(groupby_vendedora,use_container_width=True)
+st.dataframe(groupby_vendedora,use_container_width=True,hide_index=True)
 
 
 # column_config ={
