@@ -14,7 +14,10 @@ st.title("Dados das Vendedoras")
 
 vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
 
+vendedora_url = "https://rpd-visualizar.streamlit.app/visualisar?id="
+
 colunas = ["id_vendedora","nome_vendedora","EMAIL","LOJA","meta","status_vendedora"]
+vendedoras_df["url_vendedora"] = vendedoras_df["id_vendedora"].apply(lambda x: vendedora_url + x)
 
 lojas = ['TATUAPÉ', 'MOOCA', 'SANTO AMARO', 'SANTOS', 'COPACABANA',
        'LAPA', 'MOEMA', 'JARDINS', 'CAMPINAS', 'TIJUCA', 'TUCURUVI',
@@ -31,6 +34,7 @@ column_config = {
 st.data_editor(
     vendedoras_df,
     column_config=column_config,
+    column_order = ,
     hide_index=True,
     use_container_width=True
 )
