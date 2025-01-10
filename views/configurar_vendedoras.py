@@ -15,4 +15,22 @@ st.title("Dados das Vendedoras")
 vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
 
 st.write(vendedoras_df.columns)
-st.dataframe(vendedoras_df,hide_index=True,use_container_width=True)
+
+lojas = ['TATUAPÉ', 'MOOCA', 'SANTO AMARO', 'SANTOS', 'COPACABANA',
+       'LAPA', 'MOEMA', 'JARDINS', 'CAMPINAS', 'TIJUCA', 'TUCURUVI',
+       'IPIRANGA', 'LONDRINA', 'SÃO BERNARDO', 'SOROCABA', 'OSASCO',
+       'ALPHAVILLE', 'RIBEIRÃO PRETO']
+
+column_config = {
+        "LOJA": st.column_config.SelectboxColumn(
+            "loja",
+            options=lojas
+        )
+    }
+
+st.data_editor(
+    vendedoras_df,
+    column_config=column_config,
+    hide_index=True,
+    use_container_width=True
+)
