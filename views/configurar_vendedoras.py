@@ -14,7 +14,7 @@ st.title("Dados das Vendedoras")
 
 vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
 
-st.write(vendedoras_df.columns)
+colunas = ["id_vendedora","nome_vendedora","EMAIL","LOJA","meta","status_vendedora"]
 
 lojas = ['TATUAPÉ', 'MOOCA', 'SANTO AMARO', 'SANTOS', 'COPACABANA',
        'LAPA', 'MOEMA', 'JARDINS', 'CAMPINAS', 'TIJUCA', 'TUCURUVI',
