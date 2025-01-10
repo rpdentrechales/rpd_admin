@@ -38,7 +38,7 @@ column_config = {
         "meta": st.column_config.NumberColumn(
             "Meta",
             min_value=0,
-            format="R$%.2f",
+            format="R$%,.2f",
         )
         ,
         "EMAIL": st.column_config.TextColumn(
