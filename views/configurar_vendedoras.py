@@ -27,10 +27,29 @@ lojas = ['TATUAPÉ', 'MOOCA', 'SANTO AMARO', 'SANTOS', 'COPACABANA',
        'ALPHAVILLE', 'RIBEIRÃO PRETO']
 
 column_config = {
+        "nome_vendedora": st.column_config.TextColumn(
+            "Nome da Vendedora",
+            disabled = True,
+        ),
         "LOJA": st.column_config.SelectboxColumn(
-            "loja",
+            "Loja",
             options=lojas
+        ),
+        "meta": st.column_config.NumberColumn(
+            "Meta",
+            min_value=0,
+            format="R$%.2f",
         )
+        ,
+        "EMAIL": st.column_config.TextColumn(
+            "E-mail",
+            validate = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        ),
+        "url_vendedora": st.column_config.LinkColumn(
+            "URL da Vendedora",
+            display_text="Abrir URL",
+            disabled = True,
+        ),
     }
 
 st.data_editor(
