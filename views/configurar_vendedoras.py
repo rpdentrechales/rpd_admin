@@ -13,6 +13,7 @@ st.set_page_config(page_title="RPD - Configurar Vendedoras", page_icon="💎",la
 st.title("Dados das Vendedoras")
 
 vendedoras_df = get_dataframe_from_mongodb(collection_name="dados_vendedoras", database_name="rpd_db")
+vendedoras_df = vendedoras_df.loc[vendedoras_df["status_vendedora"] == True]
 
 vendedora_url = "https://rpd-visualizar.streamlit.app/visualisar?id="
 

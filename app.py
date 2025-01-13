@@ -1,11 +1,11 @@
 import streamlit as st
 
 # --- PAGE SETUP ---
-visualizar_page = st.Page(
-    "views/visualisar.py",
-    title="Visualizar Vendas Geral",
-    icon=":material/point_of_sale:"
-)
+# visualizar_page = st.Page(
+#     "views/visualisar.py",
+#     title="Visualizar Vendas Geral",
+#     icon=":material/point_of_sale:"
+# )
 configurar_page = st.Page(
     "views/configurar_vendedoras.py",
     title="Configurar Vendedoras",
@@ -16,8 +16,8 @@ configurar_page = st.Page(
 # --- NAVIGATION SETUP [WITH SECTIONS]---
 pg = st.navigation(
     {
-        "Área de Vendedora": [visualizar_page],
-        "Testes": [configurar_page]
+        # "Área de Vendedora": [visualizar_page],
+        "Link das vendedoras": [configurar_page]
     }
 )
 
