@@ -5,7 +5,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 @st.cache_data
-import pandas as pd
 from pymongo import MongoClient
 
 def get_dataframe_from_mongodb(collection_name, database_name, query={}, projection=None):
