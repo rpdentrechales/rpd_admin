@@ -5,14 +5,20 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 @st.cache_data
-def get_dataframe_from_mongodb(collection_name, database_name, query={}):
+import pandas as pd
+from pymongo import MongoClient
 
-    client = MongoClient(f"mongodb+srv://rpdprocorpo:iyiawsSCfCsuAzOb@cluster0.lu6ce.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+def get_dataframe_from_mongodb(collection_name, database_name, query={}, projection=None):
+    client = MongoClient(
+        f"mongodb+srv://rpdprocorpo:iyiawsSCfCsuAzOb@cluster0.lu6ce.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    )
     db = client[database_name]
     collection = db[collection_name]
 
-    data = list(collection.find(query))
+    # Apply the query and projection
+    data = list(collection.find(query, projection))
 
+    # Convert to DataFrame if data exists
     if data:
         dataframe = pd.DataFrame(data)
         if '_id' in dataframe.columns:
